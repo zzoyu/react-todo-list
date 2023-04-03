@@ -42,54 +42,6 @@ class Group extends Array<Task> {
   }
 }
 
-
-
-const [workingGroup, setWorkingGroup] = useState<Group>(new Group("Today"));
-
-const [groups, setGroup] = useState<Group[]>([
-  new Group("1", [
-    new Task("Get up"),
-    new Task("Brush teeth"),
-    new Task("Eat breakfast"),
-  ]),
-
-  new Group("2", [
-    new Task("Get up"),
-    new Task("Brush teeth"),
-    new Task("Eat breakfast"),
-  ]),
-  new Group("3", [
-    new Task("Get up"),
-    new Task("Brush teeth"),
-    new Task("Eat breakfast"),
-  ]),
-]);
-
-function DrawGroup(props: { group: Group }) {
-  return (
-    <article className=" w-40">
-      <h2 className="text-lg mb-2">{props.group.title}</h2>
-      <div className="flex flex-col gap-1">
-        {props.group.map((task, i) => (
-          <div
-            key={task.title + `${i}`}
-            className="flex flex-row justify-between items-center bg-slate-200 rounded p-2"
-            onClick={() => task.toggle()}
-          >
-            <p className=" text-slate-700">{task.title}</p>
-          </div>
-        ))}
-        <button
-          className="flex items-center justify-center bg-slate-500 rounded p-2 opacity-50 hover:opacity-90"
-          onClick={() => setGroup([]) props.group.push(new Task("New Task"))}
-        >
-          {plugSVG}
-        </button>
-      </div>
-    </article>
-  );
-}
-
 function showConffetti() {
   return (
     <div className="absolute top-0 left-0 w-full h-full">
@@ -107,6 +59,50 @@ function showConffetti() {
 }
 
 function App() {
+  const [workingGroup, setWorkingGroup] = useState<Group>(new Group("Today"));
+
+  const [groups, setGroup] = useState<Group[]>([
+    new Group("1", [
+      new Task("Get up"),
+      new Task("Brush teeth"),
+      new Task("Eat breakfast"),
+    ]),
+
+    new Group("2", [
+      new Task("Get up"),
+      new Task("Brush teeth"),
+      new Task("Eat breakfast"),
+    ]),
+    new Group("3", [
+      new Task("Get up"),
+      new Task("Brush teeth"),
+      new Task("Eat breakfast"),
+    ]),
+  ]);
+
+  const DrawGroup = (props: { group: Group; index?: number }) => {
+    const { group, index } = props;
+    return (
+      <article className=" w-40">
+        <h2 className="text-lg mb-2">{group.title}</h2>
+        <div className="flex flex-col gap-1">
+          {group.map((task, i) => (
+            <div
+              key={`group_${index ?? group.title}_${i}`}
+              className="flex flex-row justify-between items-center bg-slate-200 rounded p-2"
+              onClick={() => task.toggle()}
+            >
+              <p className=" text-slate-700">{task.title}</p>
+            </div>
+          ))}
+          <button className="flex items-center justify-center bg-slate-500 rounded p-2 opacity-30 hover:opacity-70">
+            {plugSVG}
+          </button>
+        </div>
+      </article>
+    );
+  };
+
   return (
     <div className="App flex flex-col items-center justify-center">
       <header className="self-center -mt-20 mb-20">
@@ -118,11 +114,11 @@ function App() {
         <DrawGroup group={workingGroup} />
       </main>
       <main className="flex flex-row gap-4 relative">
-        {groups.map((group) => (
-          <DrawGroup group={group} />
+        {groups.map((group, index) => (
+          <DrawGroup group={group} index={index} key={index} />
         ))}
         <button
-          className="absolute left-full ml-4 h-full flex flex-col justify-center items-center bg-slate-500 rounded p-2 opacity-50 hover:opacity-90"
+          className="absolute left-full ml-4 h-full flex flex-col justify-center items-center bg-slate-500 rounded p-2 opacity-30 hover:opacity-70"
           onClick={() => {
             setGroup([...groups, new Group("New Group")]);
           }}
