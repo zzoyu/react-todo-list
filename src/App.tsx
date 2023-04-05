@@ -18,6 +18,9 @@ const plugSVG = (
   </svg>
 );
 
+const buttonStyle =
+  "flex items-center justify-center bg-slate-500 rounded p-2 opacity-30 hover:opacity-70";
+
 class Task {
   constructor(
     public title: string,
@@ -121,11 +124,7 @@ function App() {
               <p className=" text-slate-700">{task.title}</p>
             </div>
           ))}
-          {add && (
-            <button className="flex items-center justify-center bg-slate-500 rounded p-2 opacity-30 hover:opacity-70">
-              {plugSVG}
-            </button>
-          )}
+          {add && <button className={buttonStyle}>{plugSVG}</button>}
         </div>
         {group.length === 0 && add === false && (
           <h2 className="text-3xl">Let's do something.</h2>
@@ -159,7 +158,7 @@ function App() {
           <DrawGroup group={group} index={index} key={index} add={true} />
         ))}
         <button
-          className="absolute left-full ml-4 h-full flex flex-col justify-center items-center bg-slate-500 rounded p-2 opacity-30 hover:opacity-70"
+          className={buttonStyle}
           onClick={() => {
             setGroup([...groups, new Group("New Group")]);
           }}
