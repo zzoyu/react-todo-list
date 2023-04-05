@@ -31,9 +31,6 @@ class Task {
     this.done = done;
     this.isEditing = isEditing;
   }
-  modify(title: string) {
-    this.title = title;
-  }
 
   toggle() {
     this.done = !this.done;
@@ -72,11 +69,6 @@ function App() {
   const DrawGroup = (props: { group: Group; index?: number; add: boolean }) => {
     const { group, index, add } = props;
     const [textTitle, setTextTitle] = useState<string>(group.title);
-    const titleInput = useRef<HTMLInputElement>(null);
-
-    useEffect(() => {
-      titleInput.current?.focus();
-    });
 
     return (
       <article className="w-40">
@@ -85,13 +77,16 @@ function App() {
             className="text-lg mb-2 outline-1 outline w-40 rounded"
             type="text"
             value={textTitle}
-            ref={titleInput}
+            autoFocus={true}
             onChange={(e) => {
               setTextTitle(e.target.value);
             }}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 group.title = textTitle;
+                group.isEditing = false;
+                setGroup([...groups]);
+              } else if (e.key === "Escape") {
                 group.isEditing = false;
                 setGroup([...groups]);
               }
@@ -115,16 +110,64 @@ function App() {
         )}
 
         <div className="flex flex-col gap-1">
-          {group.map((task, i) => (
-            <div
-              key={`group_${index ?? group.title}_${i}`}
-              className="flex flex-row justify-between items-center bg-slate-200 rounded p-2"
-              onClick={() => task.toggle()}
+          {group.map((task, i) => {
+            if (task.isEditing === true) {
+              return (
+                <input
+                  key={`group_${index ?? group.title}_${i}`}
+                  className="text-lg mb-2 outline-1 outline w-40 rounded"
+                  type="text"
+                  value={textTitle}
+                  autoFocus={true}
+                  onChange={(e) => {
+                    setTextTitle(e.target.value);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      task.isEditing = false;
+                      task.title = textTitle;
+                      setGroup([...groups]);
+                    } else if (e.key === "Escape") {
+                      task.isEditing = false;
+                      setGroup([...groups]);
+                    }
+                  }}
+                  onBlur={() => {
+                    task.isEditing = false;
+                    task.title = textTitle;
+                    setGroup([...groups]);
+                  }}
+                />
+              );
+            } else
+              return (
+                <div
+                  key={`group_${index ?? group.title}_${i}`}
+                  className="flex flex-row justify-between items-center bg-slate-200 rounded p-2"
+                >
+                  <p
+                    className=" text-slate-700"
+                    onDoubleClick={() => {
+                      setTextTitle(task.title);
+                      task.isEditing = true;
+                      setGroup([...groups]);
+                    }}
+                  >
+                    {task.title}
+                  </p>
+                </div>
+              );
+          })}
+          {add && (
+            <button
+              className={buttonStyle}
+              onClick={() => {
+                addNewTask(group);
+              }}
             >
-              <p className=" text-slate-700">{task.title}</p>
-            </div>
-          ))}
-          {add && <button className={buttonStyle}>{plugSVG}</button>}
+              {plugSVG}
+            </button>
+          )}
         </div>
         {group.length === 0 && add === false && (
           <h2 className="text-3xl">Let's do something.</h2>
@@ -133,14 +176,9 @@ function App() {
     );
   };
 
-  const toggleTask = (index: number) => {
-    workingGroup[index].toggle();
-    setWorkingGroup(workingGroup);
-  };
-
-  const addNewTask = (task: Task) => {
-    workingGroup.push(task);
-    setWorkingGroup(workingGroup);
+  const addNewTask = (targetGroup: Group) => {
+    targetGroup.push(new Task("New Task"));
+    setGroup([...groups]);
   };
 
   return (
@@ -158,7 +196,7 @@ function App() {
           <DrawGroup group={group} index={index} key={index} add={true} />
         ))}
         <button
-          className={buttonStyle}
+          className={"absolute left-full ml-4 h-full w-10" + buttonStyle}
           onClick={() => {
             setGroup([...groups, new Group("New Group")]);
           }}
