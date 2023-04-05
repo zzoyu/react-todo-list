@@ -112,20 +112,22 @@ function App() {
         <div className="flex flex-col gap-1">
           {group.map((task, i) => {
             if (task.isEditing === true) {
+              const [textTask, setTextTask] = useState<string>(task.title);
+
               return (
                 <input
                   key={`group_${index ?? group.title}_${i}`}
                   className="text-lg mb-2 outline-1 outline w-40 rounded"
                   type="text"
-                  value={textTitle}
+                  value={textTask}
                   autoFocus={true}
                   onChange={(e) => {
-                    setTextTitle(e.target.value);
+                    setTextTask(e.target.value);
                   }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       task.isEditing = false;
-                      task.title = textTitle;
+                      task.title = textTask;
                       setGroup([...groups]);
                     } else if (e.key === "Escape") {
                       task.isEditing = false;
@@ -134,7 +136,7 @@ function App() {
                   }}
                   onBlur={() => {
                     task.isEditing = false;
-                    task.title = textTitle;
+                    task.title = textTask;
                     setGroup([...groups]);
                   }}
                 />
