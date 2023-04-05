@@ -100,7 +100,7 @@ function App() {
         ) : (
           <h2
             className="text-lg mb-2"
-            onDoubleClick={() => {
+            onClick={() => {
               group.isEditing = true;
               setGroup([...groups]);
             }}
@@ -146,10 +146,23 @@ function App() {
                 <div
                   key={`group_${index ?? group.title}_${i}`}
                   className="flex flex-row justify-between items-center bg-slate-200 rounded p-2"
+                  onClick={() => {
+                    task.toggle();
+                    group.sort((a, b) => {
+                      if (a.done === b.done) return 0;
+                      else if (a.done === true) return 1;
+                      else return -1;
+                    });
+                    setGroup([...groups]);
+                  }}
                 >
                   <p
-                    className=" text-slate-700"
-                    onDoubleClick={() => {
+                    className={
+                      task.done
+                        ? " text-slate-300 line-through"
+                        : "text-slate-700"
+                    }
+                    onClickCapture={() => {
                       setTextTitle(task.title);
                       task.isEditing = true;
                       setGroup([...groups]);
@@ -179,7 +192,7 @@ function App() {
   };
 
   const addNewTask = (targetGroup: Group) => {
-    targetGroup.push(new Task("New Task"));
+    targetGroup.push(new Task("New task", false, true));
     setGroup([...groups]);
   };
 
