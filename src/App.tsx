@@ -144,18 +144,10 @@ function App() {
                   key={`group_${index ?? group.title}_${i}`}
                   className="flex flex-row justify-between items-center bg-slate-200 rounded p-2"
                   onClick={() => {
-                    if (Number(index) > 0) {
-                      workingGroup.unshift(task);
-                      group.removeTask(i);
-                    } else {
-                      task.toggle();
-                      const item = group.splice(i, 1);
-                      if (task.done === true) {
-                        group.push(...item);
-                      } else {
-                        group.unshift(...item);
-                      }
-                    }
+                    task.toggle();
+                    const item = group.splice(i, 1);
+                    if (task.done === true) group.push(...item);
+                    else group.unshift(...item);
 
                     setGroup([...groups]);
                   }}
