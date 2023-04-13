@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Group from "./Group";
 import Task from "./Task";
 
@@ -27,6 +27,7 @@ const buttonStyle =
 
 function App() {
   const [groups, setGroup] = useState<Group[]>([
+    new Group("Today", [], false),
     new Group(
       "Todo",
       [new Task("Get up"), new Task("Brush teeth"), new Task("Eat breakfast")],
@@ -130,11 +131,10 @@ function App() {
                   onClick={() => {
                     task.toggle();
                     setIsDoneEventFired(true);
-                    group.sort((a, b) => {
-                      if (a.done === b.done) return 0;
-                      else if (a.done === true) return 1;
-                      else return -1;
-                    });
+                    const item = group.splice(i, 1);
+                    if (task.done === true) group.push(...item);
+                    else group.unshift(...item);
+
                     setGroup([...groups]);
                   }}
                 >
@@ -178,6 +178,11 @@ function App() {
     setGroup([...groups]);
   };
 
+  const workingGroup = useMemo(() => {
+    return groups[0];
+  }, [groups]);
+  const todoGroups = useMemo(() => groups.slice(1), [groups]);
+
   return (
     <div className="App flex flex-col items-center justify-center">
       {Confetti(isDoneEventFired)}
@@ -187,8 +192,13 @@ function App() {
         </h1>
       </header>
       <main className="flex flex-row gap-4 relative">
-        {groups.map((group, index) => (
-          <DrawGroup group={group} index={index} key={index} add={true} />
+        {todoGroups.map((group, index) => (
+          <DrawGroup
+            group={group}
+            index={index + 1}
+            key={index + 1}
+            add={true}
+          />
         ))}
         <button
           className={"absolute left-full ml-4 h-full w-10" + buttonStyle}
