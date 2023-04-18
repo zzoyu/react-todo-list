@@ -11,5 +11,6 @@ export default class Task {
 
   toggle() {
     this.done = !this.done;
+    return this.done;
   }
 }

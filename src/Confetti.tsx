@@ -5,12 +5,14 @@ const particleTypes = ["🎉", "🎀", "💖", "🎊", "💸", "🎁", "💰"];
 
 class Particle {
   static buildRandomParticle() {
+    const x = Math.random() * window.innerWidth;
+    const y = Math.random() * window.innerHeight;
     const type =
       particleTypes[Math.floor(Math.random() * particleTypes.length)];
     const degree = Math.random() * 360;
-    const radius = Math.random() * 3 + 1;
+    const radius = Math.random() * 30 + 10;
     const color = `hsl(${Math.random() * 360}, 50%, 50%)`;
-    return new Particle(0, 0, radius, degree, color, type);
+    return new Particle(x, y, radius, degree, color, type);
   }
   constructor(
     public x: number,
@@ -52,42 +54,47 @@ class Particle {
   }
 }
 
-export default function Confetti(isDoneEventFired: boolean) {
-  const [isRunning, setIsRunning] = useState<boolean>(isDoneEventFired);
-  const [particles, setParticles] = useState<Particle[]>();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+export default function Confetti(props: { isDoneEventFired: boolean }) {
+  const [isRunning, setIsRunning] = useState<boolean>(false);
+  const [particles, setParticles] = useState<Particle[]>([]);
 
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const sampleParticle = Particle.buildRandomParticle();
+  let ctx: CanvasRenderingContext2D;
+
+  const draw = () => {
+    if (!canvasRef.current || particles.length === 0) return;
+    ctx = canvasRef.current!.getContext("2d")!;
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    particles.forEach((p) => {
+      if (!p.move()) {
+        setParticles(particles.filter((particle) => particle !== p));
+      }
+      p.draw(ctx);
+    });
+
+    requestAnimationFrame(draw);
+  };
+
+  // update the canvas until the particles are all gone.
   useEffect(() => {
     if (isRunning) {
-      const canvas = canvasRef.current;
-      if (canvas) {
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          const particles = Array.from({ length: 100 }).map(() =>
-            Particle.buildRandomParticle()
-          );
-          setParticles(particles);
-        }
-      }
-
-      const interval = setInterval(() => {
-        const canvas = canvasRef.current;
-        if (canvas) {
-          const ctx = canvas.getContext("2d");
-          if (ctx) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            const newParticles = particles?.filter((p) => p.move());
-            setParticles(newParticles);
-
-            newParticles?.forEach((p) => p.draw(ctx));
-          }
-        }
-      }, 1000 / 60);
-
-      return () => clearInterval(interval);
+      draw();
     }
   }, [isRunning]);
+
+  useEffect(() => {
+    if (props.isDoneEventFired) {
+      particles.push(Particle.buildRandomParticle());
+      particles.push(Particle.buildRandomParticle());
+      particles.push(Particle.buildRandomParticle());
+      particles.push(Particle.buildRandomParticle());
+      particles.push(Particle.buildRandomParticle());
+      particles.push(Particle.buildRandomParticle());
+      setParticles(particles);
+      setIsRunning(true);
+    }
+  }, [props.isDoneEventFired]);
 
   return (
     <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full" />

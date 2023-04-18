@@ -129,8 +129,7 @@ function App() {
                   key={`group_${index ?? group.title}_${i}`}
                   className="flex flex-row justify-between items-center bg-slate-200 rounded p-2"
                   onClick={() => {
-                    task.toggle();
-                    setIsDoneEventFired(true);
+                    task.toggle() && setIsDoneEventFired(true);
                     const item = group.splice(i, 1);
                     if (task.done === true) group.push(...item);
                     else group.unshift(...item);
@@ -185,7 +184,7 @@ function App() {
 
   return (
     <div className="App flex flex-col items-center justify-center">
-      {Confetti(isDoneEventFired)}
+      {<Confetti isDoneEventFired={isDoneEventFired} />}
       <header className="self-center -mt-20 mb-20">
         <h1>
           Get things <span className="line-through text-red-500">done.</span>
