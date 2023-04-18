@@ -10,13 +10,13 @@ import {
 const particleTypes = ["🎉", "🎀", "💖", "🎊", "💸", "🎁", "💰"];
 
 class Particle {
-  static buildRandomParticle() {
-    const x = Math.random() * window.innerWidth;
-    const y = Math.random() * window.innerHeight;
+  currentRadius: number;
+
+  static buildRandomParticleTo(x: number, y: number) {
     const type =
       particleTypes[Math.floor(Math.random() * particleTypes.length)];
     const degree = Math.random() * 360;
-    const radius = Math.random() * 30 + 10;
+    const radius = Math.random() * 10 + 5;
     const color = `hsl(${Math.random() * 360}, 50%, 50%)`;
     return new Particle(x, y, radius, degree, color, type);
   }
@@ -30,31 +30,37 @@ class Particle {
   ) {
     this.x = x;
     this.y = y;
+    this.currentRadius = radius / 2;
     this.radius = radius;
     this.degree = degree;
     this.color = color;
     this.type = type;
   }
 
+  // 삭제할지 말지를 결정하는 함수
   move(): boolean {
-    this.x += Math.cos(this.degree * (Math.PI / 180));
-    this.y += Math.sin(this.degree * (Math.PI / 180));
+    // move the particle based on the degree and gets down by gravity
+    this.x += Math.cos((this.degree * Math.PI) / 180);
+    this.y += Math.sin((this.degree * Math.PI) / 180);
+    this.degree += 0.1;
 
-    this.degree += Math.random() * 10 - 5;
+    if (this.currentRadius <= this.radius) this.currentRadius += 0.1;
 
-    this.radius -= 0.01;
-
-    if (this.radius < 0) {
-      this.radius = 0;
-    }
-
-    return this.radius > 0;
+    // boundary check
+    if (
+      this.x > window.innerWidth + this.radius ||
+      this.x < -this.radius ||
+      this.y > window.innerHeight + this.radius ||
+      this.y < -this.radius
+    )
+      return true;
+    return false;
   }
 
   draw(ctx: CanvasRenderingContext2D) {
     ctx.save();
     ctx.fillStyle = this.color;
-    ctx.font = `${this.radius * 2}px serif`;
+    ctx.font = `${this.currentRadius * 2}px serif`;
     ctx.fillText(this.type, this.x, this.y);
     ctx.restore();
   }
@@ -69,7 +75,6 @@ const Confetti = forwardRef(({}, ref) => {
   const [particles, setParticles] = useState<Particle[]>([]);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const sampleParticle = Particle.buildRandomParticle();
   let ctx: CanvasRenderingContext2D;
 
   const draw = () => {
@@ -93,13 +98,22 @@ const Confetti = forwardRef(({}, ref) => {
     }
   }, [isRunning]);
 
+  useEffect(() => {
+    if (canvasRef.current) {
+      canvasRef.current.width = window.innerWidth;
+      canvasRef.current.height = window.innerHeight;
+    }
+  }, []);
+
   const addParticles = () => {
-    particles.push(Particle.buildRandomParticle());
-    particles.push(Particle.buildRandomParticle());
-    particles.push(Particle.buildRandomParticle());
-    particles.push(Particle.buildRandomParticle());
-    particles.push(Particle.buildRandomParticle());
-    particles.push(Particle.buildRandomParticle());
+    // add random count of particles
+
+    const count = Math.floor(Math.random() * 10 + 10);
+
+    const x = Math.random() * window.innerWidth * 0.8;
+    const y = Math.random() * window.innerHeight * 0.8;
+    for (let i = 0; i < count; i++)
+      particles.push(Particle.buildRandomParticleTo(x, y));
     setParticles(particles);
     setIsRunning(true);
   };
