@@ -1,3 +1,5 @@
+import Task from "./Task";
+
 export default class Group extends Array<Task> {
   isEditing: boolean;
   constructor(
