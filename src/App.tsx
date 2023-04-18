@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Group from "./Group";
 import Task from "./Task";
 
 import "./App.css";
-import Confetti from "./Confetti";
+import Confetti, { ConfettiRef } from "./Confetti";
 
 const plugSVG = (
   <svg
@@ -35,18 +35,7 @@ function App() {
     ),
   ]);
 
-  const [isDoneEventFired, setIsDoneEventFired] = useState<boolean>(false);
-
-  // if a task is done, fire the confetti
-  useEffect(() => {
-    if (isDoneEventFired) {
-      const interval = setInterval(() => {
-        setIsDoneEventFired(false);
-      }, 1000);
-
-      return () => clearInterval(interval);
-    }
-  }, [isDoneEventFired]);
+  const confetti = useRef<ConfettiRef>(null);
 
   const DrawGroup = (props: { group: Group; index?: number; add: boolean }) => {
     const { group, index, add } = props;
@@ -129,7 +118,7 @@ function App() {
                   key={`group_${index ?? group.title}_${i}`}
                   className="flex flex-row justify-between items-center bg-slate-200 rounded p-2"
                   onClick={() => {
-                    task.toggle() && setIsDoneEventFired(true);
+                    task.toggle() && confetti.current?.addParticles?.();
                     const item = group.splice(i, 1);
                     if (task.done === true) group.push(...item);
                     else group.unshift(...item);
@@ -184,7 +173,7 @@ function App() {
 
   return (
     <div className="App flex flex-col items-center justify-center">
-      {<Confetti isDoneEventFired={isDoneEventFired} />}
+      <Confetti ref={confetti} />
       <header className="self-center -mt-20 mb-20">
         <h1>
           Get things <span className="line-through text-red-500">done.</span>

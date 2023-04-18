@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 
 // type union of particle types
 const particleTypes = ["🎉", "🎀", "💖", "🎊", "💸", "🎁", "💰"];
@@ -54,7 +60,11 @@ class Particle {
   }
 }
 
-export default function Confetti(props: { isDoneEventFired: boolean }) {
+export interface ConfettiRef {
+  addParticles: () => void;
+}
+
+const Confetti = forwardRef(({}, ref) => {
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [particles, setParticles] = useState<Particle[]>([]);
 
@@ -83,20 +93,24 @@ export default function Confetti(props: { isDoneEventFired: boolean }) {
     }
   }, [isRunning]);
 
-  useEffect(() => {
-    if (props.isDoneEventFired) {
-      particles.push(Particle.buildRandomParticle());
-      particles.push(Particle.buildRandomParticle());
-      particles.push(Particle.buildRandomParticle());
-      particles.push(Particle.buildRandomParticle());
-      particles.push(Particle.buildRandomParticle());
-      particles.push(Particle.buildRandomParticle());
-      setParticles(particles);
-      setIsRunning(true);
-    }
-  }, [props.isDoneEventFired]);
+  const addParticles = () => {
+    particles.push(Particle.buildRandomParticle());
+    particles.push(Particle.buildRandomParticle());
+    particles.push(Particle.buildRandomParticle());
+    particles.push(Particle.buildRandomParticle());
+    particles.push(Particle.buildRandomParticle());
+    particles.push(Particle.buildRandomParticle());
+    setParticles(particles);
+    setIsRunning(true);
+  };
+
+  useImperativeHandle(ref, () => ({
+    addParticles,
+  }));
 
   return (
     <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full" />
   );
-}
+});
+
+export default Confetti;
