@@ -27,7 +27,6 @@ const buttonStyle =
 
 function App() {
   const [groups, setGroup] = useState<Group[]>([
-    new Group("Today", [], false),
     new Group(
       "Todo",
       [new Task("Get up"), new Task("Brush teeth"), new Task("Eat breakfast")],
@@ -166,11 +165,6 @@ function App() {
     setGroup([...groups]);
   };
 
-  const workingGroup = useMemo(() => {
-    return groups[0];
-  }, [groups]);
-  const todoGroups = useMemo(() => groups.slice(1), [groups]);
-
   return (
     <div className="App flex flex-col items-center justify-center">
       <Confetti ref={confetti} />
@@ -180,7 +174,7 @@ function App() {
         </h1>
       </header>
       <main className="flex flex-row gap-4 relative">
-        {todoGroups.map((group, index) => (
+        {groups.map((group, index) => (
           <DrawGroup
             group={group}
             index={index + 1}
