@@ -42,9 +42,14 @@ class Particle {
     // move the particle based on the degree and gets down by gravity
     this.x += Math.cos((this.degree * Math.PI) / 180);
     this.y += Math.sin((this.degree * Math.PI) / 180);
-    this.degree += 0.1;
+
+    // falling down by gravity
+    this.degree += 0.5;
 
     if (this.currentRadius <= this.radius) this.currentRadius += 0.1;
+
+    // add speed
+    this.y += 0.5;
 
     // boundary check
     if (
@@ -106,12 +111,11 @@ const Confetti = forwardRef(({}, ref) => {
   }, []);
 
   const addParticles = () => {
-    // add random count of particles
-
     const count = Math.floor(Math.random() * 10 + 10);
 
     const x = Math.random() * window.innerWidth * 0.8;
     const y = Math.random() * window.innerHeight * 0.8;
+
     for (let i = 0; i < count; i++)
       particles.push(Particle.buildRandomParticleTo(x, y));
     setParticles(particles);
