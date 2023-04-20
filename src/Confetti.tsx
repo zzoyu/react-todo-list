@@ -16,7 +16,7 @@ class Particle {
     const type =
       particleTypes[Math.floor(Math.random() * particleTypes.length)];
     const degree = Math.random() * 360;
-    const radius = Math.random() * 10 + 5;
+    const radius = Math.random() * 30 + 20;
     const color = `hsl(${Math.random() * 360}, 50%, 50%)`;
     return new Particle(x, y, radius, degree, color, type);
   }
@@ -116,11 +116,14 @@ const Confetti = forwardRef(({}, ref) => {
   const addParticles = () => {
     const count = Math.floor(Math.random() * 10 + 10);
 
-    const x = Math.random() * window.innerWidth * 0.8;
-    const y = Math.random() * window.innerHeight * 0.8;
+    for (let i = 0; i < count; i++) {
+      const x =
+        Math.random() * window.innerWidth * 0.6 + window.innerWidth * 0.2;
+      const y =
+        Math.random() * window.innerHeight * 0.4 + window.innerHeight * 0.2;
 
-    for (let i = 0; i < count; i++)
       particles.push(Particle.buildRandomParticleTo(x, y));
+    }
     setParticles(particles);
     setIsRunning(true);
     console.log(particles.length);
