@@ -53,10 +53,10 @@ class Particle {
 
     // boundary check
     if (
-      this.x > window.innerWidth + this.radius ||
-      this.x < -this.radius ||
-      this.y > window.innerHeight + this.radius ||
-      this.y < -this.radius
+      this.x < 0 ||
+      this.x > window.innerWidth ||
+      this.y < 0 ||
+      this.y > window.innerHeight
     )
       return true;
     return false;
@@ -83,14 +83,17 @@ const Confetti = forwardRef(({}, ref) => {
   let ctx: CanvasRenderingContext2D;
 
   const draw = () => {
-    if (!canvasRef.current || particles.length === 0) return;
     ctx = canvasRef.current!.getContext("2d")!;
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-    particles.forEach((p) => {
-      if (!p.move()) {
-        setParticles(particles.filter((particle) => particle !== p));
-      }
+    if (!canvasRef.current || particles.length === 0) return;
+
+    particles.forEach((p, index) => {
       p.draw(ctx);
+
+      if (p.move()) {
+        setParticles(particles.splice(index, 1));
+        console.log("removed");
+      }
     });
 
     requestAnimationFrame(draw);
@@ -120,6 +123,7 @@ const Confetti = forwardRef(({}, ref) => {
       particles.push(Particle.buildRandomParticleTo(x, y));
     setParticles(particles);
     setIsRunning(true);
+    console.log(particles.length);
   };
 
   useImperativeHandle(ref, () => ({
