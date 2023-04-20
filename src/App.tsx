@@ -113,7 +113,7 @@ function App() {
               );
             } else
               return (
-                <div
+                <button
                   key={`group_${index ?? group.title}_${i}`}
                   className="flex flex-row justify-between items-center bg-slate-200 rounded p-2"
                   onClick={() => {
@@ -139,7 +139,7 @@ function App() {
                   >
                     {task.title}
                   </p>
-                </div>
+                </button>
               );
           })}
           {add && (
