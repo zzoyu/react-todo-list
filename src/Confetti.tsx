@@ -2,15 +2,29 @@ import {
   forwardRef,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from "react";
 
 // type union of particle types
-const particleTypes = ["🎉", "🎀", "💖", "🎊", "💸", "🎁", "💰"];
+const particleTypes = [
+  "참잘했어요",
+  "니가짱이야",
+  "👍",
+  "가보자고",
+  "🎉",
+  "🎀",
+  "💖",
+  "🎊",
+  "💸",
+  "히트다히트",
+  "💰",
+];
 
 class Particle {
   currentRadius: number;
+  isClockwise: boolean;
 
   static buildRandomParticleTo(x: number, y: number) {
     const type =
@@ -18,7 +32,8 @@ class Particle {
     const degree = Math.random() * 360;
     const radius = Math.random() * 30 + 20;
     const color = `hsl(${Math.random() * 360}, 50%, 50%)`;
-    return new Particle(x, y, radius, degree, color, type);
+    const speed = 2;
+    return new Particle(x, y, radius, degree, color, type, speed);
   }
   constructor(
     public x: number,
@@ -26,47 +41,40 @@ class Particle {
     public radius: number,
     public degree: number,
     public color: string,
-    public type: string
+    public type: string,
+    public speed: number
   ) {
     this.x = x;
     this.y = y;
-    this.currentRadius = radius / 2;
+    this.currentRadius = radius;
     this.radius = radius;
     this.degree = degree;
     this.color = color;
     this.type = type;
+    this.speed = speed;
+    this.isClockwise = Math.random() > 0.5;
   }
 
   // 삭제할지 말지를 결정하는 함수
   move(): boolean {
-    // move the particle based on the degree and gets down by gravity
-    this.x += Math.cos((this.degree * Math.PI) / 180);
-    this.y += Math.sin((this.degree * Math.PI) / 180);
-
-    // falling down by gravity
-    this.degree += 0.5;
-
-    if (this.currentRadius <= this.radius) this.currentRadius += 0.1;
-
-    // add speed
-    this.y += 0.5;
+    if (this.isClockwise) this.degree -= this.speed;
+    else this.degree += this.speed;
+    this.y += this.speed;
 
     // boundary check
-    if (
-      this.x < 0 ||
-      this.x > window.innerWidth ||
-      this.y < 0 ||
-      this.y > window.innerHeight
-    )
+    if (this.y < 0 || this.y - this.currentRadius * 2 > window.innerHeight)
       return true;
     return false;
   }
 
   draw(ctx: CanvasRenderingContext2D) {
     ctx.save();
+    ctx.beginPath();
+    ctx.translate(this.x - (this.currentRadius * this.type.length) / 2, this.y);
+    ctx.rotate(this.degree * (Math.PI / 180));
     ctx.fillStyle = this.color;
-    ctx.font = `${this.currentRadius * 2}px serif`;
-    ctx.fillText(this.type, this.x, this.y);
+    ctx.font = `${this.currentRadius}px serif`;
+    ctx.fillText(this.type, -this.currentRadius, this.currentRadius);
     ctx.restore();
   }
 }
@@ -75,28 +83,46 @@ export interface ConfettiRef {
   addParticles: () => void;
 }
 
-const Confetti = forwardRef(({}, ref) => {
+const Confetti = forwardRef(function Conffeti({}, ref) {
   const [isRunning, setIsRunning] = useState<boolean>(false);
-  const [particles, setParticles] = useState<Particle[]>([]);
+  const particles = useRef<Particle[]>([]);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  let ctx: CanvasRenderingContext2D;
 
   const draw = () => {
-    ctx = canvasRef.current!.getContext("2d")!;
-    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-    if (!canvasRef.current || particles.length === 0) return;
+    // console.log("draw", particles.current.length);
+    const ctx = canvasRef.current!.getContext("2d");
+    // console.log(ctx);
 
-    particles.forEach((p, index) => {
+    if (!ctx || particles.current.length === 0) {
+      setIsRunning(false);
+      return;
+    }
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+    // console.log("draw", particles);
+
+    particles.current.forEach((p, index) => {
       p.draw(ctx);
 
       if (p.move()) {
-        setParticles(particles.splice(index, 1));
-        console.log("removed");
+        // remove
+        removeParticleFromList(index);
+        // console.log("removed");
       }
     });
 
     requestAnimationFrame(draw);
+  };
+
+  const removeParticleFromList = (index: number) => {
+    // setParticles([...particles.splice(index, 1)]); // change this line using filter
+    particles.current.splice(index, 1);
+
+    if (particles.current.length === 0) {
+      canvasRef.current!.getContext("2d")?.clearRect(0, 0, 0, 0);
+      setIsRunning(false);
+    }
   };
 
   // update the canvas until the particles are all gone.
@@ -110,23 +136,29 @@ const Confetti = forwardRef(({}, ref) => {
     if (canvasRef.current) {
       canvasRef.current.width = window.innerWidth;
       canvasRef.current.height = window.innerHeight;
+      draw();
     }
-  }, []);
+  }, [canvasRef]);
+
+  useEffect(() => {
+    console.log("particles", particles);
+  }, [particles]);
 
   const addParticles = () => {
-    const count = Math.floor(Math.random() * 10 + 10);
+    const count = 15;
+    const tempParticles: Particle[] = [];
 
     for (let i = 0; i < count; i++) {
       const x =
-        Math.random() * window.innerWidth * 0.6 + window.innerWidth * 0.2;
-      const y =
-        Math.random() * window.innerHeight * 0.4 + window.innerHeight * 0.2;
+        Math.random() * window.innerWidth * 0.9 + window.innerWidth * 0.05;
+      const y = Math.random() * window.innerHeight * 0.5;
 
-      particles.push(Particle.buildRandomParticleTo(x, y));
+      tempParticles.push(Particle.buildRandomParticleTo(x, y));
     }
-    setParticles(particles);
+    // setParticles([...particles, ...tempParticles]);
+    particles.current = [...particles.current, ...tempParticles];
     setIsRunning(true);
-    console.log(particles.length);
+    console.log("added");
   };
 
   useImperativeHandle(ref, () => ({
