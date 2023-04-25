@@ -9,11 +9,11 @@ import DrawGroup from "./components/DrawGroup";
 
 function App() {
   const [groups, setGroups] = useState<Group[]>([
-    new Group(
-      "Todo",
-      [new Task("Get up"), new Task("Brush teeth"), new Task("Eat breakfast")],
-      false
-    ),
+    new Group("Todo", [
+      new Task("Get up"),
+      new Task("Brush teeth"),
+      new Task("Eat breakfast"),
+    ]),
   ]);
 
   const confetti = useRef<ConfettiRef>(null);
@@ -21,7 +21,7 @@ function App() {
   // draw groups
 
   const addNewTask = (targetGroup: Group) => {
-    targetGroup.push(new Task("New task", false, true));
+    targetGroup.push(new Task("New task", false));
     setGroups([...groups]);
   };
 

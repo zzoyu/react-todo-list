@@ -12,6 +12,7 @@ interface Props {
 const DrawGroup = ({ group, onGroupChange, onTaskDone }: Props) => {
   const [textTitle, setTextTitle] = useState<string>(group.title);
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isTaskAdding, setIsTaskAdding] = useState<boolean>(false);
 
   return (
     <article className="w-40">
@@ -55,6 +56,7 @@ const DrawGroup = ({ group, onGroupChange, onTaskDone }: Props) => {
         {group.map((task, i) => (
           <DrawTask
             task={task}
+            isNew={isTaskAdding && i === group.length - 1}
             onTaskChange={(task: Task) => {
               const tempGroup = new Group(group.title, [...group]);
               tempGroup[i] = task;
@@ -67,6 +69,7 @@ const DrawGroup = ({ group, onGroupChange, onTaskDone }: Props) => {
         {
           <AddButton
             onClick={() => {
+              setIsTaskAdding(true);
               onGroupChange(
                 new Group(group.title, [...group, new Task("New Task")])
               );

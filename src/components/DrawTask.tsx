@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Task from "../Task";
 
 interface Props {
   task: Task;
   onTaskChange: (task: Task) => void;
+  isNew?: boolean;
 }
 
-const DrawTask = ({ task, onTaskChange }: Props) => {
-  const [isEditing, setIsEditing] = useState<boolean>(false);
+const DrawTask = ({ task, onTaskChange, isNew }: Props) => {
+  const [isEditing, setIsEditing] = useState<boolean>(isNew || false);
   const [textTask, setTextTask] = useState<string>(task.title);
 
   if (isEditing === true) {
@@ -16,6 +17,7 @@ const DrawTask = ({ task, onTaskChange }: Props) => {
         className="text-lg mb-2 outline-1 outline w-40 rounded"
         type="text"
         value={textTask}
+        onFocus={(e) => e.target.select()}
         autoFocus={true}
         onChange={(e) => {
           setTextTask(e.target.value);
