@@ -7,8 +7,9 @@ import AddButton from "./AddButton";
 interface Props {
   group: Group;
   onGroupChange: (group: Group) => void;
+  onTaskDone: (task: Task) => void;
 }
-const DrawGroup = ({ group, onGroupChange }: Props) => {
+const DrawGroup = ({ group, onGroupChange, onTaskDone }: Props) => {
   const [textTitle, setTextTitle] = useState<string>(group.title);
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
@@ -58,6 +59,7 @@ const DrawGroup = ({ group, onGroupChange }: Props) => {
               const tempGroup = new Group(group.title, [...group]);
               tempGroup[i] = task;
               onGroupChange(tempGroup);
+              if (task.done === true) onTaskDone(task);
             }}
             key={i}
           />

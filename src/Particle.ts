@@ -17,9 +17,9 @@ export default class Particle {
   currentRadius: number;
   isClockwise: boolean;
 
-  static buildRandomParticleTo(x: number, y: number) {
+  static buildRandomParticleTo(x: number, y: number, title?: string) {
     const type =
-      particleTypes[Math.floor(Math.random() * particleTypes.length)];
+      title ?? particleTypes[Math.floor(Math.random() * particleTypes.length)];
     const degree = Math.random() * 360;
     const radius = Math.random() * 30 + 20;
     const color = `hsl(${Math.random() * 360}, 50%, 50%)`;

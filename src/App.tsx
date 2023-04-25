@@ -48,6 +48,9 @@ function App() {
                 })
               );
             }}
+            onTaskDone={(task: Task): void => {
+              confetti.current?.addParticles(task.title);
+            }}
           />
         ))}
         <AddButton

@@ -10,7 +10,7 @@ import {
 import Particle from "../Particle";
 
 export interface ConfettiRef {
-  addParticles: () => void;
+  addParticles: (title?: string) => void;
 }
 
 const Confetti = forwardRef(function Confetti({}, ref) {
@@ -20,9 +20,7 @@ const Confetti = forwardRef(function Confetti({}, ref) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const draw = () => {
-    // console.log("draw", particles.current.length);
     const ctx = canvasRef.current!.getContext("2d");
-    // console.log(ctx);
 
     if (!ctx || particles.current.length === 0) {
       setIsRunning(false);
@@ -30,15 +28,12 @@ const Confetti = forwardRef(function Confetti({}, ref) {
     }
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-    // console.log("draw", particles);
-
     particles.current.forEach((p, index) => {
       p.draw(ctx);
 
       if (p.move()) {
         // remove
         removeParticleFromList(index);
-        // console.log("removed");
       }
     });
 
@@ -46,7 +41,6 @@ const Confetti = forwardRef(function Confetti({}, ref) {
   };
 
   const removeParticleFromList = (index: number) => {
-    // setParticles([...particles.splice(index, 1)]); // change this line using filter
     particles.current.splice(index, 1);
 
     if (particles.current.length === 0) {
@@ -66,6 +60,11 @@ const Confetti = forwardRef(function Confetti({}, ref) {
     if (canvasRef.current) {
       canvasRef.current.width = window.innerWidth;
       canvasRef.current.height = window.innerHeight;
+      console.log("canvas", canvasRef.current);
+      onresize = () => {
+        canvasRef.current!.width = window.innerWidth;
+        canvasRef.current!.height = window.innerHeight;
+      };
       draw();
     }
   }, [canvasRef]);
@@ -74,7 +73,7 @@ const Confetti = forwardRef(function Confetti({}, ref) {
     console.log("particles", particles);
   }, [particles]);
 
-  const addParticles = () => {
+  const addParticles = (title?: string) => {
     const count = 15;
     const tempParticles: Particle[] = [];
 
@@ -85,10 +84,17 @@ const Confetti = forwardRef(function Confetti({}, ref) {
 
       tempParticles.push(Particle.buildRandomParticleTo(x, y));
     }
-    // setParticles([...particles, ...tempParticles]);
+    for (let i = 0; i < 5; i++) {
+      // x is between 5% and 95% of the screen width
+
+      const x =
+        Math.random() * window.innerWidth * 0.9 + window.innerWidth * 0.05;
+      const y = Math.random() * window.innerHeight * 0.5;
+
+      tempParticles.push(Particle.buildRandomParticleTo(x, y, title));
+    }
     particles.current = [...particles.current, ...tempParticles];
     setIsRunning(true);
-    console.log("added");
   };
 
   useImperativeHandle(ref, () => ({

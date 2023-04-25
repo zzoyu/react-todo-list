@@ -52,7 +52,7 @@ const DrawTask = ({ task, onTaskChange }: Props) => {
             task.done ? " text-slate-300 line-through" : "text-slate-700"
           }
           onClickCapture={() => {
-            setIsEditing(true);
+            !task.done && setIsEditing(true);
           }}
         >
           {task.title}
