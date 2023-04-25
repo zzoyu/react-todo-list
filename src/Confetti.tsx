@@ -83,7 +83,7 @@ export interface ConfettiRef {
   addParticles: () => void;
 }
 
-const Confetti = forwardRef(function Conffeti({}, ref) {
+const Confetti = forwardRef(function Confetti({}, ref) {
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const particles = useRef<Particle[]>([]);
 
