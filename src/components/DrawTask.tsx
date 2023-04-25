@@ -4,12 +4,19 @@ import Task from "../Task";
 interface Props {
   task: Task;
   onTaskChange: (task: Task) => void;
-  isNew?: boolean;
+  isNew: boolean;
 }
 
 const DrawTask = ({ task, onTaskChange, isNew }: Props) => {
   const [isEditing, setIsEditing] = useState<boolean>(isNew || false);
   const [textTask, setTextTask] = useState<string>(task.title);
+
+  useEffect(() => {
+    console.log("isNew", isNew);
+    if (isNew) {
+      setIsEditing(true);
+    }
+  }, [isNew]);
 
   if (isEditing === true) {
     return (

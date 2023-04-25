@@ -12,7 +12,7 @@ interface Props {
 const DrawGroup = ({ group, onGroupChange, onTaskDone }: Props) => {
   const [textTitle, setTextTitle] = useState<string>(group.title);
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [isTaskAdding, setIsTaskAdding] = useState<boolean>(false);
+  const [focusTaskIndex, setFocusTaskIndex] = useState<number | null>(null);
 
   return (
     <article className="w-40">
@@ -56,7 +56,7 @@ const DrawGroup = ({ group, onGroupChange, onTaskDone }: Props) => {
         {group.map((task, i) => (
           <DrawTask
             task={task}
-            isNew={isTaskAdding && i === group.length - 1}
+            isNew={focusTaskIndex === i}
             onTaskChange={(task: Task) => {
               const tempGroup = new Group(group.title, [...group]);
               tempGroup[i] = task;
@@ -69,10 +69,17 @@ const DrawGroup = ({ group, onGroupChange, onTaskDone }: Props) => {
         {
           <AddButton
             onClick={() => {
-              setIsTaskAdding(true);
-              onGroupChange(
-                new Group(group.title, [...group, new Task("New Task")])
-              );
+              const whereToAddTask = group.whereToAddTask;
+              console.log(whereToAddTask);
+
+              const tempGroup = new Group(group.title, [
+                ...group.slice(0, whereToAddTask),
+                new Task("New Task"),
+                ...group.slice(whereToAddTask),
+              ]);
+
+              onGroupChange(tempGroup);
+              setFocusTaskIndex(whereToAddTask);
             }}
           />
         }

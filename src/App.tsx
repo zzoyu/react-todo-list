@@ -55,7 +55,10 @@ function App() {
         ))}
         <AddButton
           className="absolute left-full ml-4 h-full w-10"
-          onClick={() => setGroups([...groups, new Group("New Group")])}
+          onClick={() => {
+            setGroups([...groups, new Group("New Group")]);
+            // make focus on the new group
+          }}
         />
       </main>
     </div>
