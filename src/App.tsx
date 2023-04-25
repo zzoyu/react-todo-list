@@ -5,9 +5,10 @@ import Task from "./Task";
 import "./App.css";
 import Confetti, { ConfettiRef } from "./components/Confetti";
 import AddButton from "./components/AddButton";
+import DrawGroup from "./components/DrawGroup";
 
 function App() {
-  const [groups, setGroup] = useState<Group[]>([
+  const [groups, setGroups] = useState<Group[]>([
     new Group(
       "Todo",
       [new Task("Get up"), new Task("Brush teeth"), new Task("Eat breakfast")],
@@ -17,124 +18,11 @@ function App() {
 
   const confetti = useRef<ConfettiRef>(null);
 
-  const DrawGroup = (props: { group: Group; index?: number; add: boolean }) => {
-    const { group, index, add } = props;
-    const [textTitle, setTextTitle] = useState<string>(group.title);
-
-    return (
-      <article className="w-40">
-        {group.isEditing ? (
-          <input
-            className="text-lg mb-2 outline-1 outline w-40 rounded"
-            type="text"
-            value={textTitle}
-            autoFocus={true}
-            onChange={(e) => {
-              setTextTitle(e.target.value);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                group.title = textTitle;
-                group.isEditing = false;
-                setGroup([...groups]);
-              } else if (e.key === "Escape") {
-                group.isEditing = false;
-                setGroup([...groups]);
-              }
-            }}
-            onBlur={() => {
-              group.title = textTitle;
-              group.isEditing = false;
-              setGroup([...groups]);
-            }}
-          />
-        ) : (
-          <h2
-            className="text-lg mb-2"
-            onClick={() => {
-              group.isEditing = true;
-              setGroup([...groups]);
-            }}
-          >
-            {group.title}
-          </h2>
-        )}
-
-        <div className="flex flex-col gap-1">
-          {group.map((task, i) => {
-            if (task.isEditing === true) {
-              const [textTask, setTextTask] = useState<string>(task.title);
-
-              return (
-                <input
-                  key={`group_${index ?? group.title}_${i}`}
-                  className="text-lg mb-2 outline-1 outline w-40 rounded"
-                  type="text"
-                  value={textTask}
-                  autoFocus={true}
-                  onChange={(e) => {
-                    setTextTask(e.target.value);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      task.isEditing = false;
-                      task.title = textTask;
-                      setGroup([...groups]);
-                    } else if (e.key === "Escape") {
-                      task.isEditing = false;
-                      setGroup([...groups]);
-                    }
-                  }}
-                  onBlur={() => {
-                    task.isEditing = false;
-                    task.title = textTask;
-                    setGroup([...groups]);
-                  }}
-                />
-              );
-            } else
-              return (
-                <button
-                  key={`group_${index ?? group.title}_${i}`}
-                  className="flex flex-row justify-between items-center bg-slate-200 rounded p-2"
-                  onClick={() => {
-                    task.toggle() && confetti.current?.addParticles?.();
-                    const item = group.splice(i, 1);
-                    if (task.done === true) group.push(...item);
-                    else group.unshift(...item);
-
-                    setGroup([...groups]);
-                  }}
-                >
-                  <p
-                    className={
-                      task.done
-                        ? " text-slate-300 line-through"
-                        : "text-slate-700"
-                    }
-                    onClickCapture={() => {
-                      setTextTitle(task.title);
-                      task.isEditing = true;
-                      setGroup([...groups]);
-                    }}
-                  >
-                    {task.title}
-                  </p>
-                </button>
-              );
-          })}
-          {add && <AddButton onClick={() => addNewTask(group)} />}
-        </div>
-        {group.length === 0 && add === false && (
-          <h2 className="text-3xl">Let's do something.</h2>
-        )}
-      </article>
-    );
-  };
+  // draw groups
 
   const addNewTask = (targetGroup: Group) => {
     targetGroup.push(new Task("New task", false, true));
-    setGroup([...groups]);
+    setGroups([...groups]);
   };
 
   return (
@@ -149,14 +37,22 @@ function App() {
         {groups.map((group, index) => (
           <DrawGroup
             group={group}
-            index={index + 1}
             key={index + 1}
-            add={true}
+            onGroupChange={(group: Group): void => {
+              setGroups(
+                groups.map((_, i) => {
+                  if (i === index) {
+                    return group;
+                  }
+                  return _;
+                })
+              );
+            }}
           />
         ))}
         <AddButton
           className="absolute left-full ml-4 h-full w-10"
-          onClick={() => setGroup([...groups, new Group("New Group")])}
+          onClick={() => setGroups([...groups, new Group("New Group")])}
         />
       </main>
     </div>
