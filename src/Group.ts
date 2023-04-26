@@ -1,17 +1,12 @@
 import Task from "./Task";
 
 export default class Group extends Array<Task> {
-  isEditing: boolean;
-  constructor(
-    public title: string,
-    tasks: Task[] = [],
-    isEditing: boolean = true
-  ) {
+  constructor(public title: string, tasks: Task[] = []) {
     super(...tasks);
     this.title = title;
-    this.isEditing = isEditing;
   }
-  removeTask(index: number) {
-    this.splice(index, 1);
+  get whereToAddTask(): number {
+    const firstDoneIndex = this.findIndex((task) => task.done === true);
+    return firstDoneIndex > -1 ? firstDoneIndex : this.length;
   }
 }
