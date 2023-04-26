@@ -15,6 +15,7 @@ function App() {
       new Task("Eat breakfast"),
     ]),
   ]);
+  const [focusGroupIndex, setFocusGroupIndex] = useState<number | null>(null);
 
   const confetti = useRef<ConfettiRef>(null);
 
@@ -38,6 +39,7 @@ function App() {
           <DrawGroup
             group={group}
             key={index + 1}
+            isNew={focusGroupIndex === index}
             onGroupChange={(group: Group): void => {
               group.sort((a, b) => {
                 if (a.done === b.done) return 0;
@@ -47,6 +49,7 @@ function App() {
               setGroups(
                 groups.map((_, i) => {
                   if (i === index) {
+                    if (focusGroupIndex === index) setFocusGroupIndex(null);
                     return group;
                   }
                   return _;
@@ -61,8 +64,8 @@ function App() {
         <AddButton
           className="absolute left-full ml-4 h-full w-10"
           onClick={() => {
+            setFocusGroupIndex(groups.length);
             setGroups([...groups, new Group("New Group")]);
-            // make focus on the new group
           }}
         />
       </main>

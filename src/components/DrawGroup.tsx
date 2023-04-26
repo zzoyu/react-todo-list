@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Group from "../Group";
 import DrawTask from "./DrawTask";
 import Task from "../Task";
@@ -8,10 +8,16 @@ interface Props {
   group: Group;
   onGroupChange: (group: Group) => void;
   onTaskDone: (task: Task) => void;
+  isNew?: boolean;
 }
-const DrawGroup = ({ group, onGroupChange, onTaskDone }: Props) => {
+const DrawGroup = ({
+  group,
+  onGroupChange,
+  onTaskDone,
+  isNew = false,
+}: Props) => {
   const [textTitle, setTextTitle] = useState<string>(group.title);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isEditing, setIsEditing] = useState<boolean>(isNew);
   const [focusTaskIndex, setFocusTaskIndex] = useState<number | null>(null);
 
   return (
@@ -22,6 +28,7 @@ const DrawGroup = ({ group, onGroupChange, onTaskDone }: Props) => {
           type="text"
           value={textTitle}
           autoFocus={true}
+          onFocus={(e) => e.target.select()}
           onChange={(e) => {
             setTextTitle(e.target.value);
           }}
