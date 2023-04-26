@@ -20,31 +20,33 @@ const DrawTask = ({ task, onTaskChange, isNew }: Props) => {
 
   if (isEditing === true) {
     return (
-      <input
-        className="text-lg mb-2 outline-1 outline w-40 rounded"
-        type="text"
-        value={textTask}
-        onFocus={(e) => e.target.select()}
-        autoFocus={true}
-        onChange={(e) => {
-          setTextTask(e.target.value);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
+      <div className="flex flex-row justify-between items-center bg-slate-200 rounded p-2">
+        <input
+          className="w-full bg-transparent text-slate-700"
+          type="text"
+          value={textTask}
+          onFocus={(e) => e.target.select()}
+          autoFocus={true}
+          onChange={(e) => {
+            setTextTask(e.target.value);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              setIsEditing(false);
+              const tempTask = new Task(textTask);
+              onTaskChange(tempTask);
+            } else if (e.key === "Escape") {
+              setIsEditing(false);
+              setTextTask(task.title);
+            }
+          }}
+          onBlur={() => {
             setIsEditing(false);
             const tempTask = new Task(textTask);
             onTaskChange(tempTask);
-          } else if (e.key === "Escape") {
-            setIsEditing(false);
-            setTextTask(task.title);
-          }
-        }}
-        onBlur={() => {
-          setIsEditing(false);
-          const tempTask = new Task(textTask);
-          onTaskChange(tempTask);
-        }}
-      />
+          }}
+        />
+      </div>
     );
   } else
     return (
@@ -66,6 +68,30 @@ const DrawTask = ({ task, onTaskChange, isNew }: Props) => {
         >
           {task.title}
         </p>
+        <svg
+          className="w-4 h-4 text-slate-700"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            // 24px circle
+            d="M12 4a8 8 0 100 16 8 8 0 000-16z"
+          />
+          {task.done && (
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              // draw smaller checkmark inside small circle
+              d="M18 8L8.5 15.5 6 12"
+            />
+          )}
+        </svg>
       </button>
     );
 };
