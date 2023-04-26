@@ -68,6 +68,7 @@ const DrawGroup = ({ group, onGroupChange, onTaskDone }: Props) => {
         ))}
         {
           <AddButton
+            className="mt-2"
             onClick={() => {
               const whereToAddTask = group.whereToAddTask;
               console.log(whereToAddTask);
