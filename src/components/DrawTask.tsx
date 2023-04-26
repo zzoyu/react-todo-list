@@ -14,6 +14,7 @@ const DrawTask = ({ task, onTaskChange, isNew }: Props) => {
   useEffect(() => {
     console.log("isNew", isNew);
     if (isNew) {
+      setTextTask(task.title);
       setIsEditing(true);
     }
   }, [isNew]);
@@ -55,7 +56,6 @@ const DrawTask = ({ task, onTaskChange, isNew }: Props) => {
         onClick={() => {
           const tempTask = new Task(task.title, !task.done);
           onTaskChange(tempTask);
-          // task.toggle() && confetti.current?.addParticles?.();
         }}
       >
         <p
@@ -87,7 +87,6 @@ const DrawTask = ({ task, onTaskChange, isNew }: Props) => {
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
-              // draw smaller checkmark inside small circle
               d="M18 8L8.5 15.5 6 12"
             />
           )}

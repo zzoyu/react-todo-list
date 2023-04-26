@@ -39,6 +39,11 @@ function App() {
             group={group}
             key={index + 1}
             onGroupChange={(group: Group): void => {
+              group.sort((a, b) => {
+                if (a.done === b.done) return 0;
+                if (a.done === true) return 1;
+                return -1;
+              });
               setGroups(
                 groups.map((_, i) => {
                   if (i === index) {
